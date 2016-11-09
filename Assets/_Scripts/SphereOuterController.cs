@@ -30,6 +30,8 @@ public class SphereOuterController : MonoBehaviour {
 	// Outer + Inner
 	private float outerInnerDelta = 0;
 
+	private float sizeTransDelta = 1; // to init the ball white
+
 	// Cursor Size
 	private float cursorSize = 0;
 	private Vector3 cursor3dPos;
@@ -69,11 +71,13 @@ public class SphereOuterController : MonoBehaviour {
 
 		// Cursor Size
 		cursorSize = otherLocal.transform.localScale.x;
+
+		sizeTransDelta = transitionDistance - outerInnerDelta + (cursorSize / 2);
 	}
 
 	void SetColor () {
-		lerpedColor = Color.Lerp(Color.white, Color.blue, transitionDistance - outerInnerDelta + cursorSize );
-		if (transitionDistance > 0) {
+		lerpedColor = Color.Lerp(Color.blue, Color.white, sizeTransDelta );
+		if (sizeTransDelta > 0) {
 			rend.material.color = lerpedColor;
 		} else {
 			rend.material.color = Color.red;
@@ -90,13 +94,17 @@ public class SphereOuterController : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerExit() {
+		sizeTransDelta = 1;
+		SetColor ();
+	}
+
 	void UILog() {
 		otherTransformPosText.text = "other.transform.position: " + otherLocal.transform.position;
 		cursorPos.text = "cursor3dpos: " + cursor3dPos;
 		onTriggerDist.text = "transform.position: " + transform.position;
 		innerSpherePos.text = "inner3dpos: " + inner3dPos;
 		transitionDistText.text = "cursor3dPos -> inner3dPos: " + transitionDistance;
-		float sizeTransDelta = transitionDistance - outerInnerDelta + cursorSize;
 		outerInnerDeltaText.text = "transitionDistance - outerInnerDelta: " + sizeTransDelta;
 	}
 }
