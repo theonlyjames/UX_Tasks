@@ -82,11 +82,15 @@ public class SphereOuterController : MonoBehaviour {
 								  otherLocal.transform.position.y, 
 								  otherLocal.transform.position.z);
 		inner3dPos = new Vector3 (innerSphere.transform.position.x, 
-			innerSphere.transform.position.y, innerSphere.transform.position.z);
+								  innerSphere.transform.position.y, 
+								  innerSphere.transform.position.z);
 		transitionDistance = Vector3.Distance (cursor3dPos, inner3dPos);
 	}
 
 	void CalcSphereDelta() {
+		// TODO: Switch calcultions of size
+		// to calculating object radius.		
+
 		// Calc size use x, y, or z because it's a sphear.
 		outerSize = transform.localScale.x;
 		innerSize = innerSphere.transform.localScale.x;
@@ -123,8 +127,8 @@ public class SphereOuterController : MonoBehaviour {
 	}
 		
 	void UILog() {
-		logger.Log("james was here");
-		cursor3DPos.text = ""+ cursor3dPos;
+		// logger.Log("james was here");
+		cursor3DPos.text = "" + cursor3dPos;
 		transformPosText.text = "" + transform.position;
 		innerSpherePos.text = "" + inner3dPos;
 		transitionDistText.text = "" + transitionDistance;
