@@ -13,6 +13,11 @@ Click anywhere on the screen with a mouse and the "Cursor" object will fly to th
 
 You can then use the "Cursor" object to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
 
+## Second Task
+Task: Grab a sphere, have it snap into a "seat" (upon release) if it's within X cm
+
+When you click on the screen (above the ground plane) the green sphere will move towards your mouse position. Within a certain threshold it will snap to the cursor if you keep holding the mouse down (grab simulation). With the mouse down and the green sphere "snapped" to it's position, move it towards the ground plane. When it the sphere colides with the ground it should snap to that position. This functionality was made quick and dirty style. I still need to set up a trigger point so that the object can "seat" on the plane within a variable distance (X).
+
 ### TASK LIST
 
 - Grab a sphere, have it snap into a "seat" (upon release) if it's within X cm
