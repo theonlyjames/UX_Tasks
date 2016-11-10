@@ -78,8 +78,11 @@ public class SphereOuterController : MonoBehaviour {
 	}
 
 	void CalcDistances () {
-		cursor3dPos = new Vector3(otherLocal.transform.position.x, otherLocal.transform.position.y, otherLocal.transform.position.z);
-		inner3dPos = new Vector3 (innerSphere.transform.position.x, innerSphere.transform.position.y, innerSphere.transform.position.z);
+		cursor3dPos = new Vector3(otherLocal.transform.position.x, 
+								  otherLocal.transform.position.y, 
+								  otherLocal.transform.position.z);
+		inner3dPos = new Vector3 (innerSphere.transform.position.x, 
+			innerSphere.transform.position.y, innerSphere.transform.position.z);
 		transitionDistance = Vector3.Distance (cursor3dPos, inner3dPos);
 	}
 
