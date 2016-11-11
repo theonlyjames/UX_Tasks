@@ -22,6 +22,9 @@ public class CursorController : MonoBehaviour {
 
 	private bool postDropRelease = true;
 
+
+	private float zMove;
+
 	// Key states
 	private bool letMove = false;
 	private bool wKeyPressed = false;
@@ -42,13 +45,15 @@ public class CursorController : MonoBehaviour {
 		closeEnough = false;
 		cursorCollider = GetComponent<SphereCollider> ();
 		Event.current = new Event ();
+		zMove = transform.position.z;
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
 	// mouse position when it reaches the cursor
 	void Update () {
 		mouseMovement = Input.mousePosition;
-		mouseMovement.z = -Camera.main.transform.position.z;
+		mouseMovement.z = -transform.position.z;
+		//mouseMovement.z = -Camera.main.transform.position.z;
 		mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
 
 		direction = mouseMovement - transform.position;
@@ -75,32 +80,39 @@ public class CursorController : MonoBehaviour {
 
 		// TODO: Factor out to helper
 		if (wKeyPressed || sKeyPressed) {
-			float tmp = rb.transform.position.z;
+			float tmp = transform.position.z;
+			zMove = tmp;
 			if (wKeyPressed && tmp < 5) {
-				float zMove = tmp += 0.1f;
-				mouseMovement.z = zMove;
-				rb.MovePosition (mouseMovement);
+				zMove = tmp += 0.1f;
+				//transform.position.z = zMove;
 				Debug.Log ("w keypressed");
 			} else if (sKeyPressed && tmp < 5) {
-				float zMove = tmp -= 0.1f;
-				mouseMovement.z = zMove;
-				rb.MovePosition (mouseMovement);
+				zMove = tmp -= 0.1f;
+				//transform.position.z = zMove;
 				Debug.Log ("s keypressed");
 			}
+			Vector3 adjustZ = new Vector3(transform.position.x, transform.position.y, zMove);
+			rb.MovePosition (adjustZ);
 		}
 
+		CheckKeyUp ();
+
+	}
+
+	void ResetKeysState() {
+		sKeyPressed = false;
+		wKeyPressed = false;
+	}
+
+	void CheckKeyUp() {
 		if (Input.GetKeyUp (KeyCode.W)) {
-			sKeyPressed = false;
-			wKeyPressed = false;
-			Debug.Log ("w UP");
+			ResetKeysState ();
 		} else if (Input.GetKeyUp (KeyCode.S)) {
-			wKeyPressed = false;
-			sKeyPressed = false;
-			Debug.Log ("s UP");
+			ResetKeysState ();
 		}
 	}
 
-	void SetKeyState() {
+	void SetKeyStateDown() {
 		if (Input.GetKeyDown (KeyCode.W) && !wKeyPressed) {
 			sKeyPressed = false;
 			wKeyPressed = true;
@@ -112,9 +124,9 @@ public class CursorController : MonoBehaviour {
 
 	void OnGUI() {
 		if (Event.current.Equals (Event.KeyboardEvent ("w"))) {
-			SetKeyState ();
+			SetKeyStateDown ();
 		} else if (Event.current.Equals (Event.KeyboardEvent ("s") ) ) {
-			SetKeyState ();
+			SetKeyStateDown ();
 		}
 	}
 
