@@ -56,12 +56,12 @@ public class CursorController : MonoBehaviour {
 	// mouse position when it reaches the cursor
 	void Update () {
 		mouseMovement = Input.mousePosition;
-		if (!keyDown || mouseUp) {
+		if (!keyDown) {
 			 // mouseMovement.z = -transform.position.z;
 			mouseMovement.z = -Camera.main.transform.position.z - transform.position.z;
+			mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
 		}
 
-		mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
 		direction = mouseMovement - transform.position;
 		distance = Vector3.Distance (mouseMovement, transform.position);
 			
@@ -86,14 +86,10 @@ public class CursorController : MonoBehaviour {
 
 		KeyControl();
 
-
-		CheckKeyUp ();
-
 	}
 
 	void KeyControl() {
 		// TODO: Factor out to helper
-		Debug.Log ("KeyControl");
 		if (wKeyPressed || sKeyPressed) {
 			Debug.Log ("A key was pressed");
 			float tmp = transform.position.z;
@@ -128,29 +124,26 @@ public class CursorController : MonoBehaviour {
 		keyDown = false;
 	}
 
-	void CheckKeyUp() {
-		if (Input.GetKeyUp (KeyCode.W)) {
-			ResetKeysState ();
-		} else if (Input.GetKeyUp (KeyCode.S)) {
-			ResetKeysState ();
-		}
-	}
-
 	void SetKeyStateDown() {
-		keyDown = true;
-		if (Input.GetKeyDown (KeyCode.W) && !wKeyPressed) {
+		switch (Event.current.keyCode.ToString ()) {
+		case "W":
 			sKeyPressed = false;
 			wKeyPressed = true;
-		} else if (Input.GetKeyDown (KeyCode.S) && !sKeyPressed) {
+			break;
+		case "S":
 			wKeyPressed = false;
 			sKeyPressed = true;
+			break;
+		default:
+			break;
 		}
+		keyDown = true;
 	}
 
 	void OnGUI() {
-		if (Event.current.Equals (Event.KeyboardEvent ("w"))) {
-			SetKeyStateDown ();
-		} else if (Event.current.Equals (Event.KeyboardEvent ("s") ) ) {
+		if (Event.current.type.Equals(EventType.KeyUp)) {
+			ResetKeysState ();
+		} else if (Event.current.type.Equals(EventType.KeyDown) ) {
 			SetKeyStateDown ();
 		}
 	}
