@@ -22,6 +22,14 @@ public class CursorController : MonoBehaviour {
 
 	private bool postDropRelease = true;
 
+	// Key states
+	private bool letMove = false;
+	private bool wKeyPressed = false;
+	private bool sKeyPressed = false;
+
+	// Thrust
+	public float thrust;
+
 	// LOG INFO
 	public Text groundInfoText;
 	public Text cursor3dPosText;
@@ -33,6 +41,7 @@ public class CursorController : MonoBehaviour {
 		rb = GetComponent<Rigidbody> ();
 		closeEnough = false;
 		cursorCollider = GetComponent<SphereCollider> ();
+		Event.current = new Event ();
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
@@ -47,6 +56,9 @@ public class CursorController : MonoBehaviour {
 		distance = Vector3.Distance (mouseMovement, transform.position);
 			
 		if (Input.GetMouseButton (0) && !hitGround) {
+			// Reset Keys
+			sKeyPressed = false;
+			wKeyPressed = false;
 			if (distance >= snapToCursorThreshold && !closeEnough && postDropRelease) {
 				rb.AddForce (direction * (speed));
 				rb.drag = 1 / distance;
@@ -59,6 +71,50 @@ public class CursorController : MonoBehaviour {
 			postDropRelease = true;
 			hitGround = false;
 			closeEnough = false;
+		}
+
+		// TODO: Factor out to helper
+		if (wKeyPressed || sKeyPressed) {
+			float tmp = rb.transform.position.z;
+			if (wKeyPressed && tmp < 5) {
+				float zMove = tmp += 0.1f;
+				mouseMovement.z = zMove;
+				rb.MovePosition (mouseMovement);
+				Debug.Log ("w keypressed");
+			} else if (sKeyPressed && tmp < 5) {
+				float zMove = tmp -= 0.1f;
+				mouseMovement.z = zMove;
+				rb.MovePosition (mouseMovement);
+				Debug.Log ("s keypressed");
+			}
+		}
+
+		if (Input.GetKeyUp (KeyCode.W)) {
+			sKeyPressed = false;
+			wKeyPressed = false;
+			Debug.Log ("w UP");
+		} else if (Input.GetKeyUp (KeyCode.S)) {
+			wKeyPressed = false;
+			sKeyPressed = false;
+			Debug.Log ("s UP");
+		}
+	}
+
+	void SetKeyState() {
+		if (Input.GetKeyDown (KeyCode.W) && !wKeyPressed) {
+			sKeyPressed = false;
+			wKeyPressed = true;
+		} else if (Input.GetKeyDown (KeyCode.S) && !sKeyPressed) {
+			wKeyPressed = false;
+			sKeyPressed = true;
+		}
+	}
+
+	void OnGUI() {
+		if (Event.current.Equals (Event.KeyboardEvent ("w"))) {
+			SetKeyState ();
+		} else if (Event.current.Equals (Event.KeyboardEvent ("s") ) ) {
+			SetKeyState ();
 		}
 	}
 
