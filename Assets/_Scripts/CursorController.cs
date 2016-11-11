@@ -74,6 +74,7 @@ public class CursorController : MonoBehaviour {
 				postDropRelease = false;
 				// rb.MovePosition (mouseMovement);
 				// rb.transform.position = mouseMovement;
+				closeEnough = true;
 				AdjustCursorPosition ();
 				Debug.Log ("close enoug");
 			}
@@ -139,6 +140,9 @@ public class CursorController : MonoBehaviour {
 			wKeyPressed = false;
 			sKeyPressed = true;
 			break;
+		case "R":
+			transform.position = new Vector3 (3.5f, 1.5f, 0f);
+			break;
 		default:
 			break;
 		}
@@ -176,7 +180,7 @@ public class CursorController : MonoBehaviour {
 
 	void OnMouseExit() {
 		hitGround = false;
-		closeEnough = false;
+		// closeEnough = false;
 		Debug.Log ("Mouse Exit");
 	}
 

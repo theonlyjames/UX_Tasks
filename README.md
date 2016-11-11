@@ -4,9 +4,16 @@ UX Tasks
 Instructions:
 
 Movement:
-Click anywhere on the screen with a mouse and the "Cursor" object will fly to the mouse's x and y coordinates.
+Click and hold down anywhere on the screen with the mouse and the "Cursor" (green sphere object) will have forces applied to it in the following way: 
+
+x: force applied transform.positoin.x > mouse screen postion x;
+y: force applied transform.positoin.y > mouse screen postion y;
+z: force applied transform.position.z > scene.positio.z = 0; // z will be controlled by A and S keys
+
 Pressing the "A" key moved the cursor sphere positive on the Z axis.
 Pressing the "S" key moved the cursor sphere negative on the Z axis.
+
+Pressing the "R" key sets the "Cursor" back to its original position.
 
 When the Cursor Sphere approaches the mouse an increase in drag is added until it comes to a stop. 
 When the Cursor Sphere passes the threshold and you keep mousedown it will snap onto the mouse and manipulation of the object's transform will be used instead of adding force to control it.
