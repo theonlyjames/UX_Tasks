@@ -1,22 +1,31 @@
 # UX_Tasks
 UX Tasks
 
+Instructions:
+
+Movement:
+Click anywhere on the screen with a mouse and the "Cursor" object will fly to the mouse's x and y coordinates.
+Pressing the "A" key moved the cursor sphere positive on the Z axis.
+Pressing the "S" key moved the cursor sphere negative on the Z axis.
+
+When the Cursor Sphere approaches the mouse an increase in drag is added until it comes to a stop. 
+When the Cursor Sphere passes the threshold and you keep mousedown it will snap onto the mouse and manipulation of the object's transform will be used instead of adding force to control it.
+
+You can then use the "Cursor" object to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
+
+With the mouse held down and the green sphere "snapped" to it's position, move it towards the ground plane. When it the sphere colides with the ground it should snap to that position. This functionality was made quick and dirty style. 
+I still need to set up a trigger point so that the object can "seat" on the plane within a variable distance.
+
 ## First Task Completed Notes
 
 The task I completed first has some properties of the other tasks.
 Task:
 A sphere that changes from white to blue based on palm proximity, and red when within the near threshold.
 
-Instructions:
-
-Click anywhere on the screen with a mouse and the "Cursor" object will fly to the cursor. When the Cursor approaches the mouse an increase in drag is added until it comes to a stop.When it passes the threshold and you keep mousedown it will snap onto the mouse and manipulation of the objects transform will be used instead of adding force to attract it.
-
-You can then use the "Cursor" object to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
 
 ## Second Task
 Task: Grab a sphere, have it snap into a "seat" (upon release) if it's within X cm
 
-When you click on the screen (above the ground plane) the green sphere will move towards your mouse position. Within a certain threshold it will snap to the cursor if you keep holding the mouse down (grab simulation). With the mouse down and the green sphere "snapped" to it's position, move it towards the ground plane. When it the sphere colides with the ground it should snap to that position. This functionality was made quick and dirty style. I still need to set up a trigger point so that the object can "seat" on the plane within a variable distance (X).
 
 ### TASK LIST
 

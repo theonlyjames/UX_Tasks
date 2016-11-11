@@ -26,9 +26,12 @@ public class CursorController : MonoBehaviour {
 	private float zMove;
 
 	// Key states
-	private bool letMove = false;
 	private bool wKeyPressed = false;
 	private bool sKeyPressed = false;
+	private bool keyDown = false;
+
+	// Mouse state
+	private bool mouseUp = true;
 
 	// Thrust
 	public float thrust;
@@ -46,62 +49,83 @@ public class CursorController : MonoBehaviour {
 		cursorCollider = GetComponent<SphereCollider> ();
 		Event.current = new Event ();
 		zMove = transform.position.z;
+		mouseMovement.z = -transform.position.z;
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
 	// mouse position when it reaches the cursor
 	void Update () {
 		mouseMovement = Input.mousePosition;
-		mouseMovement.z = -transform.position.z;
-		//mouseMovement.z = -Camera.main.transform.position.z;
+		if (!keyDown || mouseUp) {
+			 // mouseMovement.z = -transform.position.z;
+			mouseMovement.z = -Camera.main.transform.position.z - transform.position.z;
+		}
+
 		mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
-
 		direction = mouseMovement - transform.position;
-
 		distance = Vector3.Distance (mouseMovement, transform.position);
 			
 		if (Input.GetMouseButton (0) && !hitGround) {
-			// Reset Keys
-			sKeyPressed = false;
-			wKeyPressed = false;
-			if (distance >= snapToCursorThreshold && !closeEnough && postDropRelease) {
+			mouseUp = false;
+			if (distance >= snapToCursorThreshold && !closeEnough && postDropRelease && !keyDown) {
 				rb.AddForce (direction * (speed));
 				rb.drag = 1 / distance;
 			} else {
 				postDropRelease = false;
-				rb.transform.position = mouseMovement;
+				// rb.MovePosition (mouseMovement);
+				// rb.transform.position = mouseMovement;
+				AdjustCursorPosition ();
 				Debug.Log ("close enoug");
 			}
-		} else if ( Input.GetMouseButtonUp(0) ) {
+		} else if (Input.GetMouseButtonUp (0)) {
+			mouseUp = false;
 			postDropRelease = true;
 			hitGround = false;
 			closeEnough = false;
 		}
 
-		// TODO: Factor out to helper
-		if (wKeyPressed || sKeyPressed) {
-			float tmp = transform.position.z;
-			zMove = tmp;
-			if (wKeyPressed && tmp < 5) {
-				zMove = tmp += 0.1f;
-				//transform.position.z = zMove;
-				Debug.Log ("w keypressed");
-			} else if (sKeyPressed && tmp < 5) {
-				zMove = tmp -= 0.1f;
-				//transform.position.z = zMove;
-				Debug.Log ("s keypressed");
-			}
-			Vector3 adjustZ = new Vector3(transform.position.x, transform.position.y, zMove);
-			rb.MovePosition (adjustZ);
-		}
+		KeyControl();
+
 
 		CheckKeyUp ();
 
 	}
 
+	void KeyControl() {
+		// TODO: Factor out to helper
+		Debug.Log ("KeyControl");
+		if (wKeyPressed || sKeyPressed) {
+			Debug.Log ("A key was pressed");
+			float tmp = transform.position.z;
+			rb.drag = 10;
+			if (wKeyPressed && tmp < 5) {
+				zMove = tmp += 0.1f;
+				mouseMovement.z = zMove;
+				//transform.position.z = zMove;
+				Debug.Log ("w keypressed");
+			} else if (sKeyPressed && tmp < 5) {
+				zMove = tmp -= 0.1f;
+				mouseMovement.z = zMove;
+				//transform.position.z = zMove;
+				Debug.Log ("s keypressed");
+			}
+			//Vector3 adjustZ = new Vector3(transform.position.x, transform.position.y, zMove);
+			// rb.MovePosition (adjustZ);
+			// rb.transform.position = mouseMovement;
+			mouseMovement.x = transform.position.x;
+			mouseMovement.y = transform.position.y;
+			AdjustCursorPosition ();
+		}
+	}
+
+	void AdjustCursorPosition() {
+		transform.position = mouseMovement;
+	}
+
 	void ResetKeysState() {
 		sKeyPressed = false;
 		wKeyPressed = false;
+		keyDown = false;
 	}
 
 	void CheckKeyUp() {
@@ -113,6 +137,7 @@ public class CursorController : MonoBehaviour {
 	}
 
 	void SetKeyStateDown() {
+		keyDown = true;
 		if (Input.GetKeyDown (KeyCode.W) && !wKeyPressed) {
 			sKeyPressed = false;
 			wKeyPressed = true;
