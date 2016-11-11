@@ -67,7 +67,7 @@ public class CursorController : MonoBehaviour {
 			
 		if (Input.GetMouseButton (0) && !hitGround) {
 			mouseUp = false;
-			if (distance >= snapToCursorThreshold && !closeEnough && postDropRelease && !keyDown) {
+			if (distance >= snapToCursorThreshold && !closeEnough && !keyDown) {
 				rb.AddForce (direction * (speed));
 				rb.drag = 1 / distance;
 			} else {
@@ -90,32 +90,37 @@ public class CursorController : MonoBehaviour {
 
 	void KeyControl() {
 		// TODO: Factor out to helper
-		if (wKeyPressed || sKeyPressed) {
+		Vector3 dir = transform.position;
+		if (wKeyPressed || sKeyPressed && keyDown) {
 			Debug.Log ("A key was pressed");
 			float tmp = transform.position.z;
-			rb.drag = 10;
-			if (wKeyPressed && tmp < 5) {
-				zMove = tmp += 0.1f;
-				mouseMovement.z = zMove;
+			//rb.drag = 10;
+			if (wKeyPressed) {
+				//zMove = tmp += 0.1f;
+				// mouseMovement.z = zMove;
 				//transform.position.z = zMove;
+				dir = transform.forward;
 				Debug.Log ("w keypressed");
-			} else if (sKeyPressed && tmp < 5) {
-				zMove = tmp -= 0.1f;
-				mouseMovement.z = zMove;
+			} else if (sKeyPressed) {
+				//zMove = tmp -= 0.1f;
+				//mouseMovement.z = zMove;
 				//transform.position.z = zMove;
+				dir = -transform.forward;
 				Debug.Log ("s keypressed");
 			}
 			//Vector3 adjustZ = new Vector3(transform.position.x, transform.position.y, zMove);
 			// rb.MovePosition (adjustZ);
 			// rb.transform.position = mouseMovement;
-			mouseMovement.x = transform.position.x;
-			mouseMovement.y = transform.position.y;
-			AdjustCursorPosition ();
+			// mouseMovement.x = transform.position.x;
+			// mouseMovement.y = transform.position.y;
+			//AdjustCursorPosition ();
+			rb.MovePosition(transform.position + (dir * speed) * Time.deltaTime);
 		}
 	}
 
 	void AdjustCursorPosition() {
-		transform.position = mouseMovement;
+		//rb.MovePosition (new Vector3 (mouseMovement.x, mouseMovement.y, transform.position.z));
+		rb.MovePosition (mouseMovement);
 	}
 
 	void ResetKeysState() {
