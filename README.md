@@ -16,7 +16,7 @@ Pressing the "S" key moved the cursor sphere negative on the Z axis.
 Pressing the "R" key sets the "Cursor" back to its original position.
 
 When the Cursor Sphere approaches the mouse an increase in drag is added until it comes to a stop. 
-When the Cursor Sphere passes the threshold and you keep mousedown it will snap onto the mouse and manipulation of the object's transform will be used instead of adding force to control it.
+When the Cursor Sphere passes the threshold (defined by Cursor Mouse Position delta) and you keep mousedown it will snap onto the position (mouse x,y cursor sphere's z = 0) and manipulation of the object's transform will be used instead of adding force to the "Cursor" Sphere.
 
 You can then use the "Cursor" object to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
 
