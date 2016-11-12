@@ -97,7 +97,9 @@ public class CursorController : MonoBehaviour {
 	}
 
 	void AdjustCursorPosition() {
-		rb.MovePosition (mouseMovement);
+		if (!hitGround) {
+			rb.MovePosition (mouseMovement);
+		}
 	}
 
 	void ResetKeysState() {
@@ -118,6 +120,7 @@ public class CursorController : MonoBehaviour {
 			break;
 		case "R":
 			transform.position = new Vector3 (3.5f, 1.5f, 0f);
+			rb.velocity = Vector3.zero;
 			break;
 		default:
 			break;
@@ -142,9 +145,9 @@ public class CursorController : MonoBehaviour {
 			groundInfoText.text = " " + other.transform.position;
 			cursor3dPosText.text = " " + transform.position;
 			rb.drag = 10;
-			rb.velocity = Vector3.zero;
 			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
-			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.y));
+			rb.velocity = new Vector3(0, 0, 0);
+			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
 		}
 		// Have the sphere set its x and z relative to its closes position on the ground
 	}
