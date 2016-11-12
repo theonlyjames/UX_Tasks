@@ -20,11 +20,19 @@ public class CursorController : MonoBehaviour {
 
 	private bool hitGround = false;
 
-	private bool postDropRelease = true;
+
+	// Key states
+	private bool wKeyPressed = false;
+	private bool sKeyPressed = false;
+	private bool keyDown = false;
+
+	// Thrust
+	public float thrust;
 
 	// LOG INFO
 	public Text groundInfoText;
 	public Text cursor3dPosText;
+	public Text mouseCursorDeltaText;
 
 	private SphereCollider cursorCollider;
 
@@ -33,32 +41,98 @@ public class CursorController : MonoBehaviour {
 		rb = GetComponent<Rigidbody> ();
 		closeEnough = false;
 		cursorCollider = GetComponent<SphereCollider> ();
+		Event.current = new Event ();
+
+		 mouseMovement.z = -transform.position.z;
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
 	// mouse position when it reaches the cursor
 	void Update () {
 		mouseMovement = Input.mousePosition;
-		mouseMovement.z = -Camera.main.transform.position.z;
-		mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
+		if (!keyDown) {
+			 // mouseMovement.z = -transform.position.z;
+			mouseMovement.z = -Camera.main.transform.position.z - transform.position.z;
+			mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
+		}
 
 		direction = mouseMovement - transform.position;
 
-		distance = Vector3.Distance (mouseMovement, transform.position);
+		CalcMouseCursorDelta ();
 			
 		if (Input.GetMouseButton (0) && !hitGround) {
-			if (distance >= snapToCursorThreshold && !closeEnough && postDropRelease) {
-				rb.AddForce (direction * (speed));
+			if (distance >= snapToCursorThreshold && !closeEnough && !keyDown) {
+				rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
 				rb.drag = 1 / distance;
 			} else {
-				postDropRelease = false;
-				rb.transform.position = mouseMovement;
+				closeEnough = true;
+				AdjustCursorPosition ();
 				Debug.Log ("close enoug");
 			}
-		} else if ( Input.GetMouseButtonUp(0) ) {
-			postDropRelease = true;
+		} else if (Input.GetMouseButtonUp (0)) {
 			hitGround = false;
 			closeEnough = false;
+		}
+
+		KeyControl();
+	}
+
+	void CalcMouseCursorDelta() {
+		Vector3 tmp = mouseMovement;
+		tmp.z = transform.position.z;
+		distance = Vector3.Distance (tmp, transform.position);
+	}
+
+	void KeyControl() {
+		// TODO: Factor out to helper
+		Vector3 dir = transform.position;
+		if (wKeyPressed || sKeyPressed && keyDown) {
+			if (wKeyPressed) {
+				dir = transform.forward;
+			} else if (sKeyPressed) {
+				dir = -transform.forward;
+			}
+			rb.MovePosition(transform.position + (dir * speed) * Time.deltaTime);
+		}
+	}
+
+	void AdjustCursorPosition() {
+		if (!hitGround) {
+			rb.MovePosition (mouseMovement);
+		}
+	}
+
+	void ResetKeysState() {
+		sKeyPressed = false;
+		wKeyPressed = false;
+		keyDown = false;
+	}
+
+	void SetKeyStateDown() {
+		switch (Event.current.keyCode.ToString ()) {
+		case "W":
+			sKeyPressed = false;
+			wKeyPressed = true;
+			break;
+		case "S":
+			wKeyPressed = false;
+			sKeyPressed = true;
+			break;
+		case "R":
+			transform.position = new Vector3 (3.5f, 1.5f, 0f);
+			rb.velocity = Vector3.zero;
+			break;
+		default:
+			break;
+		}
+		keyDown = true;
+	}
+
+	void OnGUI() {
+		if (Event.current.type.Equals(EventType.KeyUp)) {
+			ResetKeysState ();
+		} else if (Event.current.type.Equals(EventType.KeyDown) ) {
+			SetKeyStateDown ();
 		}
 	}
 
@@ -67,10 +141,13 @@ public class CursorController : MonoBehaviour {
 		// When the sphere hits the ground 
 		// Stop the sphear from following the cursor
 		if(other.CompareTag("Ground")) {
+			hitGround = true;
 			groundInfoText.text = " " + other.transform.position;
 			cursor3dPosText.text = " " + transform.position;
-			transform.position = new Vector3 (transform.position.x, cursorCollider.radius, transform.position.z);
-			hitGround = true;
+			rb.drag = 10;
+			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
+			rb.velocity = new Vector3(0, 0, 0);
+			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
 		}
 		// Have the sphere set its x and z relative to its closes position on the ground
 	}
@@ -80,28 +157,18 @@ public class CursorController : MonoBehaviour {
 
 	void OnMouseUp() {
 		closeEnough = false;
-		Debug.Log ("Mouse UP");
 	}
 
 	void OnMouseExit() {
 		hitGround = false;
-		closeEnough = false;
-		Debug.Log ("Mouse Exit");
 	}
 
+	void LogData() {
+		mouseMovement.z = transform.position.z;
+		mouseCursorDeltaText.text = " " + distance;
+	}
 
-//	SAVE THIS CODE IT WORKS FOR ELASTISITY
-//	void Update () {
-//		if (Input.GetMouseButton (0)) {
-//			mouseMovement = Input.mousePosition;
-//			mouseMovement.z = -Camera.main.transform.position.z;
-//			mouseMovement = Camera.main.ScreenToWorldPoint(mouseMovement);
-//			direction = mouseMovement - transform.position;
-//			// rigidbody.transform.position = direction;
-//			// rigidbody.velocity = ( ( transform.right * mouseMovement.x ) + ( transform.forward * mouseMovement.y ) ) / Time.deltaTime;
-//			// rigidbody.velocity = new Vector3( ( transform.position.x * mouseMovement.x ), ( transform.position.y * mouseMovement.y ), ( transform.position.z * mouseMovement.z ) );
-//			rigidbody.AddForce (direction * (speed / Time.deltaTime));
-//			Debug.Log(Input.mousePosition);
-//		}
-//	}
+	void FixedUpdate() {
+		LogData ();
+	}
 }
