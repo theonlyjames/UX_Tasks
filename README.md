@@ -1,24 +1,24 @@
 # UX_Tasks
 UX Tasks
 
-Instructions:
+###Instructions:
 
-Movement:
+**Movement:**
 Click and hold down anywhere on the screen with the mouse and the "Cursor" (green sphere object) will have forces applied to it in the following way: 
 
-x: force applied transform.positoin.x > mouse screen postion x;
-y: force applied transform.positoin.y > mouse screen postion y;
-z: force applied transform.position.z > scene.positio.z = 0; // z will be controlled by A and S keys
+- x: force applied transform.positoin.x > mouse screen postion x;
+- y: force applied transform.positoin.y > mouse screen postion y;
+- z: force applied transform.position.z > scene.positio.z = 0; // z will be controlled by A and S keys
 
-Pressing the "A" key moved the cursor sphere positive on the Z axis.
-Pressing the "S" key moved the cursor sphere negative on the Z axis.
+- Pressing the "A" key moved the cursor sphere positive on the Z axis.
+- Pressing the "S" key moved the cursor sphere negative on the Z axis.
 
-Pressing the "R" key sets the "Cursor" back to its original position.
+- Pressing the "R" key sets the "Cursor" back to its original position.
 
 When the Cursor Sphere approaches the mouse an increase in drag is added until it comes to a stop. 
 When the Cursor Sphere passes the threshold (defined by Cursor Mouse Position delta) and you keep mousedown it will snap onto the position (mouse x,y cursor sphere's z = 0) and manipulation of the object's transform will be used instead of adding force to the "Cursor" Sphere.
 
-You can then use the "Cursor" object to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
+You can then use the "Cursor" sphere to pass through the translucent outer sphere (I could have just used the Sphere Collider here) to change the inner sphere from white to blue then red when it hits the threshold.
 
 With the mouse held down and the green sphere "snapped" to it's position, move it towards the ground plane. When it the sphere colides with the ground it should snap to that position. This functionality was made quick and dirty style. 
 I still need to set up a trigger point so that the object can "seat" on the plane within a variable distance.
