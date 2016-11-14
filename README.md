@@ -3,6 +3,8 @@ UX Tasks
 
 ###Instructions:
 
+You may need to toggle the activity of the different Game Objects to see the interations. 
+
 **Movement:**
 Click and hold down anywhere on the screen with the mouse and the "Cursor" (green sphere object) will have forces applied to it in the following way: 
 
@@ -14,6 +16,11 @@ Click and hold down anywhere on the screen with the mouse and the "Cursor" (gree
 - Pressing the "S" key moved the cursor sphere negative on the Z axis.
 
 - Pressing the "R" key sets the "Cursor" back to its original position.
+
+For spawning circles around the "Circle Object Container" turn off the "SphereOuter" game object.
+
+- Pressing the "Space" key spawns new child objects
+
 
 When the Cursor Sphere approaches the mouse an increase in drag is added until it comes to a stop. 
 When the Cursor Sphere passes the threshold (defined by Cursor Mouse Position delta) and you keep mousedown it will snap onto the position (mouse x,y cursor sphere's z = 0) and manipulation of the object's transform will be used instead of adding force to the "Cursor" Sphere.
