@@ -37,23 +37,11 @@ public class ChildContainerController : MonoBehaviour {
 			bulletSpawn.rotation
 		);
 
-		// Set the bullet inside container
-		//bullet.transform.SetParent (this);
-
 		bullet.transform.parent = transform;
 
 		var brb = bullet.GetComponent<Rigidbody> ();
 
-		// Add velocity to the bullet
-		//brb.velocity = bullet.transform.forward;
-
-		//if (bullet.transform.position.z >= 2) {
-			// bullet.GetComponent<Rigidbody> ().velocity = Vector3.zero;
-//			var bx = bullet.transform.position.x;
-//			var by = bullet.transform.position.y;
 		bullet.transform.position = new Vector3 (0.0f, 0.0f, 2);
-			Debug.Log ("> 2");
-		//}
 
 		// number of objects
 		numberOfObjects = numberOfObjects += 1;
