@@ -49,6 +49,9 @@ public class CursorController : MonoBehaviour {
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
 	// mouse position when it reaches the cursor
 	void Update () {
+	}
+
+	void FixedUpdate() {
 		mouseMovement = Input.mousePosition;
 		if (!keyDown) {
 			 // mouseMovement.z = -transform.position.z;
@@ -75,6 +78,8 @@ public class CursorController : MonoBehaviour {
 		}
 
 		KeyControl();
+
+		LogData ();
 	}
 
 	void CalcMouseCursorDelta() {
@@ -166,9 +171,5 @@ public class CursorController : MonoBehaviour {
 	void LogData() {
 		mouseMovement.z = transform.position.z;
 		mouseCursorDeltaText.text = " " + distance;
-	}
-
-	void FixedUpdate() {
-		LogData ();
 	}
 }
