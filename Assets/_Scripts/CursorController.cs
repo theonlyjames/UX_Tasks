@@ -107,11 +107,7 @@ public class CursorController : MonoBehaviour {
 	}
 
 	void AdjustCursorPosition(Vector3 updatePosition) {
-
 		rb.MovePosition (transform.position - updatePosition * Time.deltaTime);
-//		if (!hitGround) {
-//			rb.MovePosition (mouseMovement);
-//		}
 	}
 
 	void ResetKeysState() {
@@ -131,7 +127,7 @@ public class CursorController : MonoBehaviour {
 			sKeyPressed = true;
 			break;
 		case "R":
-			transform.position = new Vector3 (3.5f, 1.5f, 0f);
+			transform.position = new Vector3 (3.5f, 3.0f, 0f);
 			rb.velocity = Vector3.zero;
 			break;
 		default:
@@ -150,17 +146,6 @@ public class CursorController : MonoBehaviour {
 
 
 	void OnTriggerEnter(Collider other) {
-		// When the sphere hits the ground 
-		// Stop the sphear from following the cursor
-		if(other.CompareTag("Ground")) {
-//			hitGround = true;
-//			groundInfoText.text = " " + other.transform.position;
-//			cursor3dPosText.text = " " + transform.position;
-//			rb.drag = 10;
-//			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
-//			rb.velocity = new Vector3(0, 0, 0);
-//			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
-		}
 		SetSeat (other);
 	}
 
