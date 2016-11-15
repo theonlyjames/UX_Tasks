@@ -11,7 +11,6 @@ public class CursorController : MonoBehaviour {
 	private double snapToCursorThreshold = 0.1;
 	private bool hitGround = false;
 
-
 	// Key states
 	private bool wKeyPressed = false;
 	private bool sKeyPressed = false;
@@ -19,6 +18,8 @@ public class CursorController : MonoBehaviour {
 
 	// Trigger states
 	private bool seatEnter = false;
+
+	private bool doneMoving = true;
 
 	public int speed;
 
@@ -30,13 +31,14 @@ public class CursorController : MonoBehaviour {
 	public Text cursor3dPosText;
 	public Text mouseCursorDeltaText;
 
+	private bool canRepel = false;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
 		Event.current = new Event ();
 
-		 mouseMovement.z = -transform.position.z;
+		mouseMovement.z = -transform.position.z;
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
@@ -56,14 +58,26 @@ public class CursorController : MonoBehaviour {
 
 		//CalcMouseCursorDelta ();
 		var snapTo = new Vector3 (transform.position.x, 0.7f, 0.0f);
+
 			
-		if (MouseClickState()) {
+		if (MouseClickState ()) {
 			if (!keyDown) {
 				MovePositionWithForce (mouseMovement);
+				if (doneMoving) {
+					canRepel = true;
+					doneMoving = false;
+				} else {
+					canRepel = false;
+				}
 			}
+			Debug.Log (canRepel);
 		} else {
-			if (seatEnter && CalcMouseCursorDelta(snapTo)) {
-				MovePositionWithForce(snapTo);
+			Debug.Log ("Nock Click Down");
+			if (seatEnter) {
+				MovePositionWithForce (snapTo);
+				canRepel = false;
+			} else if(canRepel) {
+				RepelFromMousePosition ();
 			}
 		}
 
@@ -76,14 +90,36 @@ public class CursorController : MonoBehaviour {
 		return Input.GetMouseButton (0);
 	}
 
+	void RepelFromMousePosition () {
+		float x = mouseMovement.x + 1.1f;
+		float y = mouseMovement.y + 1.1f;
+		float z = transform.position.z + 1.1f;
+		Vector3 repelFromCursor = new Vector3 (x, y, z);
+		MovePositionWithForce (repelFromCursor);
+	}
+
 	void MovePositionWithForce (Vector3 snapToPosition) {
+		canRepel = false;
 		var dist = Vector3.Distance (snapToPosition, transform.position);
+		var dragDenom = dist;
+		distance = dist;
+
+		//Debug.Log (doneMoving);
+
+		if (dist <= snapToCursorThreshold) {
+			doneMoving = true;
+			return;
+		} else if (dist <= 0.2) {
+			dragDenom = 1;
+			Debug.Log ("Drag Denom < 1.2");
+		}
+
+		doneMoving = false;
 
 		direction = snapToPosition - transform.position;
 		rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
-		rb.drag = 1 / dist;
+		rb.drag = 1 / dragDenom;
 
-		//Debug.Log (dist);
 	}
 
 	private bool CalcMouseCursorDelta(Vector3 goTo) {
