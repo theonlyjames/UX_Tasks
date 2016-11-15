@@ -5,26 +5,25 @@ using UnityEngine.UI;
 public class CursorController : MonoBehaviour {
 
 	private Vector3 mouseMovement;
-
 	private Rigidbody rb;
-
 	private Vector3 direction;
-
 	private float distance;
-
 	private bool closeEnough;
-
-	public int speed;
-
 	private double snapToCursorThreshold = 0.09;
-
 	private bool hitGround = false;
+	private Vector3 seatPos;
 
 
 	// Key states
 	private bool wKeyPressed = false;
 	private bool sKeyPressed = false;
 	private bool keyDown = false;
+
+	// Trigger states
+	private bool seatEnter = false;
+	private bool stopMotion = false;
+
+	public int speed;
 
 	// Thrust
 	public float thrust;
@@ -63,23 +62,43 @@ public class CursorController : MonoBehaviour {
 
 		CalcMouseCursorDelta ();
 			
-		if (Input.GetMouseButton (0) && !hitGround) {
-			if (distance >= snapToCursorThreshold && !closeEnough && !keyDown) {
-				rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
-				rb.drag = 1 / distance;
-			} else {
-				closeEnough = true;
-				AdjustCursorPosition ();
-				Debug.Log ("close enoug");
-			}
-		} else if (Input.GetMouseButtonUp (0)) {
+		//if (Input.GetMouseButton (0) && !hitGround) {
+//			if (distance >= snapToCursorThreshold && !closeEnough && !keyDown) {
+//				rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
+//				rb.drag = 1 / distance;
+//			} else {
+//				closeEnough = true;
+//				AdjustCursorPosition (mouseMovement);
+//				Debug.Log ("close enoug");
+//			}
+		//} else if (Input.GetMouseButtonUp (0)) {
 			hitGround = false;
 			closeEnough = false;
-		}
+			if (seatEnter && !stopMotion) {
+				Vector3 pos = Vector3.zero;
+				//AdjustCursorPosition (pos);
+				MovePositionWithForce();
+			}
+		//}
+
 
 		KeyControl();
 
 		LogData ();
+	}
+
+	void MovePositionWithForce () {
+		var snapTo = new Vector3 (transform.position.x, 0.5f, 0.0f);
+		direction = snapTo - transform.position;
+		rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
+
+		var dist = Vector3.Distance (snapTo, transform.position);
+
+		rb.drag = 1 / dist;
+		if (dist <= 0.1) {
+			stopMotion = true;
+		}
+		Debug.Log (dist);
 	}
 
 	void CalcMouseCursorDelta() {
@@ -101,10 +120,12 @@ public class CursorController : MonoBehaviour {
 		}
 	}
 
-	void AdjustCursorPosition() {
-		if (!hitGround) {
-			rb.MovePosition (mouseMovement);
-		}
+	void AdjustCursorPosition(Vector3 updatePosition) {
+
+		rb.MovePosition (transform.position - updatePosition * Time.deltaTime);
+//		if (!hitGround) {
+//			rb.MovePosition (mouseMovement);
+//		}
 	}
 
 	void ResetKeysState() {
@@ -146,19 +167,34 @@ public class CursorController : MonoBehaviour {
 		// When the sphere hits the ground 
 		// Stop the sphear from following the cursor
 		if(other.CompareTag("Ground")) {
-			hitGround = true;
-			groundInfoText.text = " " + other.transform.position;
-			cursor3dPosText.text = " " + transform.position;
-			rb.drag = 10;
-			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
-			rb.velocity = new Vector3(0, 0, 0);
-			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
+//			hitGround = true;
+//			groundInfoText.text = " " + other.transform.position;
+//			cursor3dPosText.text = " " + transform.position;
+//			rb.drag = 10;
+//			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
+//			rb.velocity = new Vector3(0, 0, 0);
+//			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
 		}
-		// Have the sphere set its x and z relative to its closes position on the ground
+		SetSeat (other);
 	}
 
-	void ClearGates() {
+	void OnTriggerExit(Collider other) {
+		if (other.gameObject.CompareTag ("Seat")) {
+			seatEnter = true;
+			stopMotion = false;
+			Debug.Log ("Seat EXIT");
+		}
 	}
+
+	void SetSeat(Collider other) {
+		if (other.gameObject.CompareTag ("Seat")) {
+			Debug.Log ("Seat Entered");
+			seatPos = new Vector3 (transform.position.x, 0.2f, 0.0f);
+			seatEnter = true;
+			//rb.MovePosition (seatPos * Time.deltaTime);
+		}
+	}
+
 
 	void OnMouseUp() {
 		closeEnough = false;

@@ -62,17 +62,17 @@ public class SphereOuterController : MonoBehaviour {
 		otherLocal = null;
 		var col = GetComponent<SphereCollider> ();
 		var outerRadius = col.radius;
-		Debug.LogFormat ("Outter Rad: {0}", outerRadius);
+		//Debug.LogFormat ("Outter Rad: {0}", outerRadius);
 	}
 
 	void Update () {
 		if (Input.GetMouseButton (0)) {
-			logger.Log ("outerInnerDelta: ", outerInnerDelta);
+			//logger.Log ("outerInnerDelta: ", outerInnerDelta);
 		}
 	}
 
 	void OnTriggerEnter(Collider other) {
-		logger.Log ("ontroggerenter");
+		//logger.Log ("ontroggerenter");
 		if (other.CompareTag ("Cursor")) {
 		}
 	}
