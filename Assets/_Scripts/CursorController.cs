@@ -5,26 +5,23 @@ using UnityEngine.UI;
 public class CursorController : MonoBehaviour {
 
 	private Vector3 mouseMovement;
-
 	private Rigidbody rb;
-
 	private Vector3 direction;
-
 	private float distance;
-
-	private bool closeEnough;
-
-	public int speed;
-
-	private double snapToCursorThreshold = 0.09;
-
+	private double snapToCursorThreshold = 0.1;
 	private bool hitGround = false;
-
 
 	// Key states
 	private bool wKeyPressed = false;
 	private bool sKeyPressed = false;
 	private bool keyDown = false;
+
+	// Trigger states
+	private bool seatEnter = false;
+
+	private bool doneMoving = true;
+
+	public int speed;
 
 	// Thrust
 	public float thrust;
@@ -34,16 +31,14 @@ public class CursorController : MonoBehaviour {
 	public Text cursor3dPosText;
 	public Text mouseCursorDeltaText;
 
-	private SphereCollider cursorCollider;
+	private bool canRepel = false;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
-		closeEnough = false;
-		cursorCollider = GetComponent<SphereCollider> ();
 		Event.current = new Event ();
 
-		 mouseMovement.z = -transform.position.z;
+		mouseMovement.z = -transform.position.z;
 	}
 	
 	// Colider Flys to mouse position and when it gets there it jumps around to the 
@@ -59,22 +54,30 @@ public class CursorController : MonoBehaviour {
 			mouseMovement = Camera.main.ScreenToWorldPoint (mouseMovement);
 		}
 
-		direction = mouseMovement - transform.position;
+		// direction = mouseMovement - transform.position;
 
-		CalcMouseCursorDelta ();
+		//CalcMouseCursorDelta ();
+		var snapTo = new Vector3 (transform.position.x, 0.7f, 0.0f);
+
 			
-		if (Input.GetMouseButton (0) && !hitGround) {
-			if (distance >= snapToCursorThreshold && !closeEnough && !keyDown) {
-				rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
-				rb.drag = 1 / distance;
-			} else {
-				closeEnough = true;
-				AdjustCursorPosition ();
-				Debug.Log ("close enoug");
+		if (MouseClickState ()) {
+			if (!keyDown) {
+				MovePositionWithForce (mouseMovement);
+				if (doneMoving) {
+					canRepel = true;
+					doneMoving = false;
+				} else {
+					canRepel = false;
+				}
 			}
-		} else if (Input.GetMouseButtonUp (0)) {
-			hitGround = false;
-			closeEnough = false;
+			Debug.Log (canRepel);
+		} else {
+			if (seatEnter) {
+				MovePositionWithForce (snapTo);
+				canRepel = false;
+			} else if(canRepel) {
+				RepelFromMousePosition ();
+			}
 		}
 
 		KeyControl();
@@ -82,10 +85,47 @@ public class CursorController : MonoBehaviour {
 		LogData ();
 	}
 
-	void CalcMouseCursorDelta() {
-		Vector3 tmp = mouseMovement;
+	private bool MouseClickState() {
+		return Input.GetMouseButton (0);
+	}
+
+	void RepelFromMousePosition () {
+		float x = mouseMovement.x + 1.1f;
+		float y = mouseMovement.y + 1.1f;
+		float z = transform.position.z + 1.1f;
+		Vector3 repelFromCursor = new Vector3 (x, y, z);
+		MovePositionWithForce (repelFromCursor);
+	}
+
+	void MovePositionWithForce (Vector3 snapToPosition) {
+		canRepel = false;
+		var dist = Vector3.Distance (snapToPosition, transform.position);
+		var dragDenom = dist;
+		distance = dist;
+
+		//Debug.Log (doneMoving);
+
+		if (dist <= snapToCursorThreshold) {
+			doneMoving = true;
+			return;
+		} else if (dist <= 0.2) {
+			dragDenom = 1;
+			Debug.Log ("Drag Denom < 1.2");
+		}
+
+		doneMoving = false;
+
+		direction = snapToPosition - transform.position;
+		rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
+		rb.drag = 1 / dragDenom;
+
+	}
+
+	private bool CalcMouseCursorDelta(Vector3 goTo) {
+		Vector3 tmp = goTo;
 		tmp.z = transform.position.z;
 		distance = Vector3.Distance (tmp, transform.position);
+		return distance >= snapToCursorThreshold; 
 	}
 
 	void KeyControl() {
@@ -101,10 +141,8 @@ public class CursorController : MonoBehaviour {
 		}
 	}
 
-	void AdjustCursorPosition() {
-		if (!hitGround) {
-			rb.MovePosition (mouseMovement);
-		}
+	void AdjustCursorPosition(Vector3 updatePosition) {
+		rb.MovePosition (transform.position - updatePosition * Time.deltaTime);
 	}
 
 	void ResetKeysState() {
@@ -124,7 +162,7 @@ public class CursorController : MonoBehaviour {
 			sKeyPressed = true;
 			break;
 		case "R":
-			transform.position = new Vector3 (3.5f, 1.5f, 0f);
+			transform.position = new Vector3 (3.5f, 3.0f, 0f);
 			rb.velocity = Vector3.zero;
 			break;
 		default:
@@ -143,29 +181,22 @@ public class CursorController : MonoBehaviour {
 
 
 	void OnTriggerEnter(Collider other) {
-		// When the sphere hits the ground 
-		// Stop the sphear from following the cursor
-		if(other.CompareTag("Ground")) {
-			hitGround = true;
-			groundInfoText.text = " " + other.transform.position;
-			cursor3dPosText.text = " " + transform.position;
-			rb.drag = 10;
-			rb.AddForce(new Vector3 (-direction.x * speed, -direction.y * speed, 0.0f));
-			rb.velocity = new Vector3(0, 0, 0);
-			rb.position = (new Vector3 (transform.position.x, other.gameObject.transform.position.y + cursorCollider.radius, transform.position.z));
+		SetSeat (other);
+	}
+
+	void OnTriggerExit(Collider other) {
+		if (other.gameObject.CompareTag ("Seat")) {
+			seatEnter = false;
+			Debug.Log ("Seat EXIT");
 		}
-		// Have the sphere set its x and z relative to its closes position on the ground
 	}
 
-	void ClearGates() {
-	}
-
-	void OnMouseUp() {
-		closeEnough = false;
-	}
-
-	void OnMouseExit() {
-		hitGround = false;
+	void SetSeat(Collider other) {
+		if (other.gameObject.CompareTag ("Seat")) {
+			Debug.Log ("Seat Entered");
+			seatEnter = true;
+			//rb.MovePosition (seatPos * Time.deltaTime);
+		}
 	}
 
 	void LogData() {
