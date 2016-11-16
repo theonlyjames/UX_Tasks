@@ -72,7 +72,6 @@ public class CursorController : MonoBehaviour {
 			}
 			Debug.Log (canRepel);
 		} else {
-			Debug.Log ("Nock Click Down");
 			if (seatEnter) {
 				MovePositionWithForce (snapTo);
 				canRepel = false;
