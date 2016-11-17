@@ -25,14 +25,12 @@ public class ScreenController : MonoBehaviour {
 	}
 
 	void OnMouseEnter () {
-		Debug.Log ("mouse enter");
 		hoverState = 1;
-		SetColor ();
+		//SetColor ();
 	}
 
 	void OnMouseExit () {
-		Debug.Log ("mouse enter");
 		hoverState = 0;
-		SetColor ();
+		//SetColor ();
 	}
 }
