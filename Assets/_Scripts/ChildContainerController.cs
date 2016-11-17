@@ -40,7 +40,6 @@ public class ChildContainerController : MonoBehaviour {
 			Quaternion rot = Quaternion.FromToRotation(Vector3.forward, center-pos);
 			child.rotation = rot;
 			child.position = pos;
-			Debug.Log(child.position);
 		}
 	}
 
