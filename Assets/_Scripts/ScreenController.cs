@@ -23,12 +23,15 @@ public class ScreenController : MonoBehaviour {
 	// Borrow END
 	//
 
+	public GameObject hyperlink;
+	private Renderer hyperlinkRend;
+
 	// public Renderer rend;
 	public GameObject cursor;
 	public Color lerpedColor;
 
 	private Vector3 mouseMovement;
-	private int hoverState = 0;
+	private Vector3 rayOrigin;
 
 	// Use this for initialization
 	void Start () {
@@ -41,21 +44,22 @@ public class ScreenController : MonoBehaviour {
 
 		//rend = GetComponent<Renderer>();
 		lerpedColor = Color.white;
+
+		hyperlinkRend = hyperlink.GetComponent<Renderer> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		// Check if the player has pressed the fire button and if enough time has elapsed since they last fired
-		if (Input.GetButtonDown("Fire1") && Time.time > nextFire) 
-		{
+		if (Input.GetButtonDown ("Fire1") && Time.time > nextFire) {
 			// Update the time when our player can fire next
 			nextFire = Time.time + fireRate;
 
 			// Start our ShotEffect coroutine to turn our laser line on and off
-			StartCoroutine (ShotEffect());
+			StartCoroutine (ShotEffect ());
 
 			// Create a vector at the center of our camera's viewport
-			Vector3 rayOrigin = fpsCam.ViewportToWorldPoint (cursor.transform.position + (cursor.transform.forward * weaponRange));
+			rayOrigin = fpsCam.ViewportToWorldPoint (cursor.transform.position + (cursor.transform.forward * weaponRange));
 
 			// Declare a raycast hit to store information about what our raycast has hit
 			RaycastHit hit;
@@ -64,8 +68,7 @@ public class ScreenController : MonoBehaviour {
 			laserLine.SetPosition (0, gunEnd.position);
 
 			// Check if our raycast has hit anything
-			if (Physics.Raycast (rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
-			{
+			if (Physics.Raycast (rayOrigin, fpsCam.transform.forward, out hit, weaponRange)) {
 				// Set the end position for our laser line 
 				//laserLine.SetPosition (1, hit.point);
 
@@ -75,23 +78,35 @@ public class ScreenController : MonoBehaviour {
 				// If there was a health script attached
 				//if (health != null)
 				//{
-					// Call the damage function of that script, passing in our gunDamage variable
-					//health.Damage (gunDamage);
+				// Call the damage function of that script, passing in our gunDamage variable
+				//health.Damage (gunDamage);
 				//}
 
 				// Check if the object we hit has a rigidbody attached
-				if (hit.rigidbody != null)
-				{
+				if (hit.rigidbody != null) {
 					// Add force to the rigidbody we hit, in the direction from which it was hit
 					//hit.rigidbody.AddForce (-hit.normal * hitForce);
+					//Debug.Log ("HIT");
 				}
-			}
-			else
-			{
+			} else {
 				// If we did not hit anything, set the end of the line to a position directly in front of the camera at the distance of weaponRange
 				laserLine.SetPosition (1, cursor.transform.position + (cursor.transform.forward * weaponRange));
 			}
+		} else {
+			// Declare a raycast hit to store information about what our raycast has hit
+			RaycastHit hit;
+
+			if (Physics.Raycast (gunEnd.position, (cursor.transform.forward * weaponRange), out hit, weaponRange)) {
+				if (hit.collider.gameObject.CompareTag ("Hyperlink")) {
+					Debug.Log ("HIT");
+					hyperlinkRend.material.color = Color.red;
+				} else {
+					hyperlinkRend.material.color = Color.white;
+				}
+			} 
 		}
+
+		Debug.DrawRay(gunEnd.position, (cursor.transform.forward * weaponRange), Color.green);
 	}
 
 	private IEnumerator ShotEffect()
@@ -103,24 +118,6 @@ public class ScreenController : MonoBehaviour {
 		yield return shotDuration;
 
 		// Deactivate our line renderer after waiting
-		laserLine.enabled = false;
-	}
-
-	void FixedUpdate() {
-	}
-
-//	void SetColor () {
-//		lerpedColor = Color.Lerp(Color.blue, Color.white, hoverState );
-//		rend.material.color = lerpedColor;
-//	}
-
-	void OnMouseEnter () {
-		hoverState = 1;
-		//SetColor ();
-	}
-
-	void OnMouseExit () {
-		hoverState = 0;
-		//SetColor ();
+		 laserLine.enabled = false;
 	}
 }
