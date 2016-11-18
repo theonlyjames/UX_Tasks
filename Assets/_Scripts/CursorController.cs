@@ -31,6 +31,8 @@ public class CursorController : MonoBehaviour {
 	public Text cursor3dPosText;
 	public Text mouseCursorDeltaText;
 
+	private float dist;
+
 	private bool canRepel = false;
 
 	// Use this for initialization
@@ -62,21 +64,22 @@ public class CursorController : MonoBehaviour {
 			
 		if (MouseClickState ()) {
 			if (!keyDown) {
-				MovePositionWithForce (mouseMovement);
-				if (doneMoving) {
+				MovePositionWithForce (mouseMovement, transform.position, 1);
+				if (doneMoving && dist <= 0.05) {
 					canRepel = true;
 					doneMoving = false;
+					Debug.Log ("stoped moving and close");
 				} else {
 					canRepel = false;
 				}
 			}
-			Debug.Log (canRepel);
 		} else {
 			if (seatEnter) {
-				MovePositionWithForce (snapTo);
+				MovePositionWithForce (snapTo, transform.position, 1);
 				canRepel = false;
-			} else if(canRepel) {
+			} else if(GetDistance(mouseMovement, transform.position) <= 0.2) {
 				RepelFromMousePosition ();
+				Debug.Log ("can repel");
 			}
 		}
 
@@ -90,26 +93,34 @@ public class CursorController : MonoBehaviour {
 	}
 
 	void RepelFromMousePosition () {
-		float x = mouseMovement.x + 1.1f;
-		float y = mouseMovement.y + 1.1f;
+		float x = mouseMovement.x + 3.1f;
+		float y = mouseMovement.y + 3.1f;
 		float z = transform.position.z + 1.1f;
 		Vector3 repelFromCursor = new Vector3 (x, y, z);
-		MovePositionWithForce (repelFromCursor);
+		MovePositionWithForce (repelFromCursor, transform.position, 10);
+		//direction = repelFromCursor - transform.position;
+		//rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
 	}
 
-	void MovePositionWithForce (Vector3 snapToPosition) {
+	private float GetDistance(Vector3 start, Vector3 end) {
+		float distance = Vector3.Distance (start, end);
+		return distance;
+	}
+
+	void MovePositionWithForce (Vector3 snapToPosition, Vector3 endPosition, float drag) {
 		canRepel = false;
-		var dist = Vector3.Distance (snapToPosition, transform.position);
-		var dragDenom = dist;
-		distance = dist;
+		dist = GetDistance (snapToPosition, endPosition);
+		//var dragDenom = dist;
+
 
 		//Debug.Log (doneMoving);
 
 		if (dist <= snapToCursorThreshold) {
+			canRepel = true;
 			doneMoving = true;
 			return;
 		} else if (dist <= 0.2) {
-			dragDenom = 1;
+			//dragDenom = 1;
 			Debug.Log ("Drag Denom < 1.2");
 		}
 
@@ -117,7 +128,7 @@ public class CursorController : MonoBehaviour {
 
 		direction = snapToPosition - transform.position;
 		rb.AddForce (new Vector3 (direction.x * speed, direction.y * speed, direction.z * speed));
-		rb.drag = 1 / dragDenom;
+		rb.drag = drag / dist;
 
 	}
 

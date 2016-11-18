@@ -107,7 +107,7 @@ public class SphereOuterController : MonoBehaviour {
 		if (sizeTransDelta > threshold) {
 			rend.material.color = lerpedColor;
 		} else {
-			rend.material.color = Color.red;
+			//rend.material.color = Color.red;
 		}
 	}
 
