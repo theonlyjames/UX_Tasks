@@ -55,7 +55,7 @@ public class ScreenController : MonoBehaviour {
 			StartCoroutine (ShotEffect());
 
 			// Create a vector at the center of our camera's viewport
-			Vector3 rayOrigin = fpsCam.ViewportToWorldPoint (new Vector3(0.5f, 0.5f, 0.0f));
+			Vector3 rayOrigin = fpsCam.ViewportToWorldPoint (cursor.transform.position + (cursor.transform.forward * weaponRange));
 
 			// Declare a raycast hit to store information about what our raycast has hit
 			RaycastHit hit;
