@@ -176,6 +176,11 @@ public class CursorController : MonoBehaviour {
 			transform.position = new Vector3 (3.5f, 3.0f, 0f);
 			rb.velocity = Vector3.zero;
 			break;
+		case "H":
+			var active = gameObject.activeSelf ? false : true;
+			Debug.Log (active);
+			gameObject.SetActive (active);
+			break;
 		default:
 			break;
 		}

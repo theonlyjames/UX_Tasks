@@ -23,6 +23,8 @@ public class ScreenController : MonoBehaviour {
 	// Borrow END
 	//
 
+	private bool stopShoot = true;
+
 	public GameObject hyperlink;
 	private Renderer hyperlinkRend;
 
@@ -51,7 +53,7 @@ public class ScreenController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		// Check if the player has pressed the fire button and if enough time has elapsed since they last fired
-		if (Input.GetButtonDown ("Fire1") && Time.time > nextFire) {
+		if (Input.GetButtonDown ("Fire1") && Time.time > nextFire && !stopShoot) {
 			// Update the time when our player can fire next
 			nextFire = Time.time + fireRate;
 
@@ -119,5 +121,18 @@ public class ScreenController : MonoBehaviour {
 
 		// Deactivate our line renderer after waiting
 		 laserLine.enabled = false;
+	}
+
+	void SetKeyStateDown() {
+		switch (Event.current.keyCode.ToString ()) {
+		case "H":
+			stopShoot = false;
+			break;
+		case "J":
+			stopShoot = true;
+			break;
+		default:
+			break;
+		}
 	}
 }
