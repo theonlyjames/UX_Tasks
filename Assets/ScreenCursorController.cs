@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ScreenCursorController : MonoBehaviour {
 	public GameObject screen;
+	public GameObject toggleObject;
 
 	private Vector3 mouseMovement;
 	private Vector3 screenPosition;
@@ -24,6 +25,8 @@ public class ScreenCursorController : MonoBehaviour {
 	void FixedUpdate() {
 		if (follow) {
 			FollowMouseToggle ();
+		} else {
+			toggleObject.SetActive (true);
 		}
 	}
 

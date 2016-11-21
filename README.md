@@ -13,6 +13,8 @@ The rectangle translucent box is the "Seat" area that kind of acts like the tool
 
 - Pressing "H" will lock a "Screen Cursor" Object to the screen an allow you to hover over the box "Hyperlink" on the screen in the background area.
 
+- Pressing "J" will lock a "Screen Cursor" stop the following of the Screen Cursor
+
 Click and hold down anywhere on the screen with the mouse and the "Cursor" (green sphere object) will have forces applied to it in the following way:
 
 - x: force applied transform.positoin.x > mouse screen postion x;
